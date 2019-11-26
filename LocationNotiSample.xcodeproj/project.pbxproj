@@ -349,7 +349,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = ET468ENYPG;
+				DEVELOPMENT_TEAM = F8M2L3Y6MA;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = LocationNotiSample/PrefixHeader.pch;
 				INFOPLIST_FILE = LocationNotiSample/Info.plist;
@@ -369,7 +369,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = ET468ENYPG;
+				DEVELOPMENT_TEAM = F8M2L3Y6MA;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = LocationNotiSample/PrefixHeader.pch;
 				INFOPLIST_FILE = LocationNotiSample/Info.plist;

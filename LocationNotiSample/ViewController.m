@@ -115,7 +115,7 @@
     [[AFHTTPSessionManager manager] GET:url
                              parameters:nil
                                progress:nil
-                                success:^(NSURLSessionDataTask *task, NSArray * responseObject) {
+                                success:^(NSURLSessionDataTask *task, NSArray *responseObject) {
         NSLog(@"responseObject == %@", responseObject);
         
         // 1. 先移除所有推送
@@ -131,6 +131,12 @@
             NSString *latitude = dic[@"latitude"];
             NSString *longitude = dic[@"longitude"];
             [self addToNotificationWithTitle:addr_name atitude:latitude longitude:longitude];
+            
+//            CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
+//            [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
+//                CLPlacemark *placemark = [placemarks firstObject];
+//                NSLog(@"推送地址 == %@", placemark);
+//            }];
         }];
         
         NSString *info = [NSString stringWithFormat:@"已成功设置 %ld 个位置推送", responseObject.count];
@@ -166,7 +172,7 @@
                                    body:@"测试提醒body"
                                latitude:[latitude doubleValue]
                               longitude:[longitude doubleValue]
-                                 radius:360
+                                 radius:500
                                  repeat:YES
                          notiIdentifier:indentifier];
     
