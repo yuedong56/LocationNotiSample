@@ -1,0 +1,22 @@
+//
+//  PrefixHeader.pch
+//  LocationNotiSample
+//
+//  Created by yuedongkui on 2019/11/26.
+//  Copyright © 2019 LY. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#import <MBProgressHUD/MBProgressHUD.h>
+#import <AFNetworking/AFNetworking.h>
+#import "UIViewController+HUD.h"
+
+#define  kScreenWidth  ([UIScreen mainScreen].bounds.size.width)
+#define  kScreenHeight ([UIScreen mainScreen].bounds.size.height)
+
+#define  ImageNamed(name) [UIImage imageNamed:name]
+
+
+#endif /* PrefixHeader_pch */
