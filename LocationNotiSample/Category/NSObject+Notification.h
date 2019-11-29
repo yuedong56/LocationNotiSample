@@ -24,4 +24,7 @@
 
 + (void)removeNotificationWithIndentifier:(NSString *)indentifer;
 
++ (void)removeAllNotification;
+
+
 @end

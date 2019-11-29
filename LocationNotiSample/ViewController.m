@@ -11,8 +11,6 @@
 #import "LYBottomBar.h"
 #import "LYTableHeader.h"
 
-#define kAllNotis_Indentifer @"kAllNotis_Indentifer"
-
 @interface ViewController ()<UITableViewDelegate, UITableViewDataSource, LYTableFooterDelegete>
 {
     NSMutableArray *models;
@@ -82,25 +80,15 @@
 - (void)p_updateNotifications
 {
     // 1. 先移除所有推送
-    NSArray *allNotiIds = [[NSUserDefaults standardUserDefaults] objectForKey:kAllNotis_Indentifer];
-    [allNotiIds enumerateObjectsUsingBlock:^(NSString *indentifer, NSUInteger idx, BOOL *stop) {
-        [NSObject removeNotificationWithIndentifier:indentifer];
-    }];
-    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:kAllNotis_Indentifer];
-    
+    [NSObject removeAllNotification];
+
     // 2. 根据地理位置更新推送
     __block int selectedCount = 0;
     [models enumerateObjectsUsingBlock:^(LocationModel *model, NSUInteger idx, BOOL *stop) {
         if (model.isSelected) {
-            [self addToNotificationWithTitle:model.locationDes atitude:model.latitude longitude:model.longitude];
+            [self addToNotificationWithTitle:model.locationDes latitude:model.latitude longitude:model.longitude];
             selectedCount ++;
         }
-        
-//            CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
-//            [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
-//                CLPlacemark *placemark = [placemarks firstObject];
-//                NSLog(@"推送地址 == %@", placemark);
-//            }];
     }];
     
     NSString *info = [NSString stringWithFormat:@"已成功设置 %d 个位置推送", selectedCount];
@@ -111,24 +99,16 @@
     }
 }
 
-- (void)addToNotificationWithTitle:(NSString *)title atitude:(NSString *)latitude longitude:(NSString *)longitude
+- (void)addToNotificationWithTitle:(NSString *)title latitude:(NSString *)latitude longitude:(NSString *)longitude
 {
     NSString *indentifier = [NSString stringWithFormat:@"%@_%@_%@", title, latitude, longitude];
     [NSObject sendNotificationWithTitle:title
                                    body:@"测试提醒body"
                                latitude:[latitude doubleValue]
                               longitude:[longitude doubleValue]
-                                 radius:_header.radiusField.text.length>0 ? _header.radiusField.text.doubleValue : 200
+                                 radius:_header.radiusField.text.length>0 ? _header.radiusField.text.doubleValue : 500
                                  repeat:YES
                          notiIdentifier:indentifier];
-    
-    NSMutableArray *mArr = [[[NSUserDefaults standardUserDefaults] objectForKey:kAllNotis_Indentifer] mutableCopy];
-    if (mArr == nil) {
-        mArr = [NSMutableArray array];
-    }
-    [mArr addObject:indentifier];
-    [[NSUserDefaults standardUserDefaults] setObject:mArr forKey:kAllNotis_Indentifer];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)reloadData

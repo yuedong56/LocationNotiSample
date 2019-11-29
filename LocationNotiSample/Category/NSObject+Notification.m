@@ -36,7 +36,7 @@
     CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:coordinate
                                                                  radius:radius
                                                              identifier:notiIdentifier];
-    NSLog(@"region === %@ (%f, %f)", region, coordinate.latitude, coordinate.longitude);
+    NSLog(@"设置推送信息：region === %@ (%f, %f, %f)", region, coordinate.latitude, coordinate.longitude, radius);
     UNLocationNotificationTrigger *trigger = [UNLocationNotificationTrigger triggerWithRegion:region
                                                                                       repeats:isRepeat];
     
@@ -50,6 +50,11 @@
 + (void)removeNotificationWithIndentifier:(NSString *)indentifer;
 {
     [[UNUserNotificationCenter currentNotificationCenter] removePendingNotificationRequestsWithIdentifiers:@[indentifer]];
+}
+
++ (void)removeAllNotification;
+{
+    [[UNUserNotificationCenter currentNotificationCenter] removeAllPendingNotificationRequests];
 }
 
 @end
