@@ -8,22 +8,20 @@
 
 #import "ViewController.h"
 #import "NSObject+Notification.h"
-
+#import "LYBottomBar.h"
+#import "LYTableHeader.h"
 
 #define kAllNotis_Indentifer @"kAllNotis_Indentifer"
 
-@interface ViewController ()<CLLocationManagerDelegate>
+@interface ViewController ()<UITableViewDelegate, UITableViewDataSource, LYTableFooterDelegete>
 {
     
 }
-
-@property (nonatomic, strong) CLLocationManager *locationManager;
-@property (nonatomic, strong) CLGeocoder *geocoder;
-
-@property (nonatomic, strong) UIButton *locationButton;
-@property (nonatomic, strong) UILabel *locationLabel;
-
 @property (nonatomic, strong) UIButton *updateButton;
+@property (nonatomic, strong) LYBottomBar *bottomBar;
+
+@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) LYTableHeader *header;
 
 @end
 
@@ -35,68 +33,39 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-      
-    //
-    self.locationButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.locationButton setTitle:@"点击获取定位" forState:UIControlStateNormal];
-    [self.locationButton  addTarget:self action:@selector(locationButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:self.locationButton];
-
-    self.locationLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.locationLabel.font = [UIFont systemFontOfSize:12];
-    self.locationLabel.textAlignment = NSTextAlignmentCenter;
-    self.locationLabel.textColor = [UIColor blackColor];
-    [self.view addSubview:self.locationLabel];
+          
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectZero];
+    self.tableView.delegate =  self;
+    self.tableView.dataSource = self;
+    [self.view addSubview:self.tableView];
+    
+    self.header = [[LYTableHeader alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, LYTableFooter_Height)];
+    self.header.delegate = self;
+    self.tableView.tableHeaderView = self.header;
     
     //
     self.updateButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.updateButton setTitle:@"点击更新位置推送" forState:UIControlStateNormal];
+    [self.updateButton setTitle:@"点击添加位置推送" forState:UIControlStateNormal];
     [self.view addSubview:self.updateButton];
     [self.updateButton addTarget:self action:@selector(updateButtonAction:) forControlEvents:UIControlEventTouchUpInside];
     
     //
-    [self locationButtonAction:self.locationButton];
-    [self updateButtonAction:self.updateButton];
+    self.bottomBar = [[LYBottomBar alloc] initWithFrame:CGRectZero];
+    [self.view addSubview:self.bottomBar];
 }
 
 - (void)viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
     
-    self.locationLabel.frame = CGRectMake(10, 100, (kScreenWidth-20), 50);
-    self.locationButton.frame = CGRectMake((kScreenWidth-160)/2, 140, 160, 44);
-    self.updateButton.frame = CGRectMake((kScreenWidth-160)/2, 200, 160, 44);
+    self.bottomBar.frame = CGRectMake(0, kScreenHeight-self.view.safeAreaInsets.bottom-kLYBottomBar_Height, kScreenWidth, kLYBottomBar_Height);
+    self.updateButton.frame = CGRectMake((kScreenWidth-160)/2, self.bottomBar.frame.origin.y-44, 160, 44);
+    
+    self.tableView.frame = CGRectMake(0, self.view.safeAreaInsets.top, kScreenWidth, kScreenHeight-self.view.safeAreaInsets.bottom-self.view.safeAreaInsets.top-kLYBottomBar_Height-100);
 }
 
 #pragma mark -
-- (void)locationButtonAction:(UIButton *)button
-{
-    //定位管理器
-    self.locationManager = [[CLLocationManager alloc]init];
-    
-    if (![CLLocationManager locationServicesEnabled]) {
-        NSLog(@"定位服务当前可能尚未打开，请设置打开！");
-        return;
-    }
-    
-    //如果没有授权则请求用户授权
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
-        [_locationManager requestWhenInUseAuthorization];
-    }
-    else if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse){
-        //设置代理
-        _locationManager.delegate = self;
-        //设置定位精度
-        _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-        //定位频率,每隔多少米定位一次
-        CLLocationDistance distance = 10.0;//十米定位一次
-        _locationManager.distanceFilter = distance;
-        
-        //启动跟踪定位
-        [_locationManager startUpdatingLocation];
-    }
-}
-
+//更新推送
 - (void)updateButtonAction:(UIButton *)button
 {
     [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:UNAuthorizationOptionAlert|UNAuthorizationOptionSound
@@ -109,63 +78,34 @@
 
 - (void)p_updateNotifications
 {
-    [self showProgressHUDWithText:@"正在更新位置推送..."];
+    NSArray *locations = nil;
     
-    NSString *url = @"http://b612-beta.kajicam.com/ts/api/push/demo/get";
-    [[AFHTTPSessionManager manager] GET:url
-                             parameters:nil
-                               progress:nil
-                                success:^(NSURLSessionDataTask *task, NSArray *responseObject) {
-        NSLog(@"responseObject == %@", responseObject);
+    // 1. 先移除所有推送
+    NSArray *allNotiIds = [[NSUserDefaults standardUserDefaults] objectForKey:kAllNotis_Indentifer];
+    [allNotiIds enumerateObjectsUsingBlock:^(NSString *indentifer, NSUInteger idx, BOOL *stop) {
+        [NSObject removeNotificationWithIndentifier:indentifer];
+    }];
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:kAllNotis_Indentifer];
+    
+    // 2. 根据地理位置更新推送
+    [locations enumerateObjectsUsingBlock:^(NSDictionary *dic, NSUInteger idx, BOOL *stop) {
+        NSString *addr_name = dic[@"addr_name"];
+        NSString *latitude = dic[@"latitude"];
+        NSString *longitude = dic[@"longitude"];
+        [self addToNotificationWithTitle:addr_name atitude:latitude longitude:longitude];
         
-        // 1. 先移除所有推送
-        NSArray *allNotiIds = [[NSUserDefaults standardUserDefaults] objectForKey:kAllNotis_Indentifer];
-        [allNotiIds enumerateObjectsUsingBlock:^(NSString *indentifer, NSUInteger idx, BOOL *stop) {
-            [NSObject removeNotificationWithIndentifier:indentifer];
-        }];
-        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:kAllNotis_Indentifer];
-        
-        // 2. 根据地理位置更新推送
-        [responseObject enumerateObjectsUsingBlock:^(NSDictionary *dic, NSUInteger idx, BOOL *stop) {
-            NSString *addr_name = dic[@"addr_name"];
-            NSString *latitude = dic[@"latitude"];
-            NSString *longitude = dic[@"longitude"];
-            [self addToNotificationWithTitle:addr_name atitude:latitude longitude:longitude];
-            
 //            CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
 //            [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
 //                CLPlacemark *placemark = [placemarks firstObject];
 //                NSLog(@"推送地址 == %@", placemark);
 //            }];
-        }];
-        
-        NSString *info = [NSString stringWithFormat:@"已成功设置 %ld 个位置推送", responseObject.count];
-        [self showAlertWithTitle:info];
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self hideProgressHUD];
-        });
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self hideProgressHUD];
-        });
-        NSString *errorInfo = [NSString stringWithFormat:@"更新失败：%@", error.localizedDescription];
-        [self showAlertWithTitle:errorInfo];
     }];
+    
+    NSString *info = [NSString stringWithFormat:@"已成功设置 %ld 个位置推送", locations.count];
+    [self showAlertWithTitle:info];
 }
 
-- (void)showAlertWithTitle:(NSString *)title
-{
-    NSLog(@"%@", title);
-
-    UIAlertController *vc = [UIAlertController alertControllerWithTitle:title message:@"" preferredStyle:UIAlertControllerStyleAlert];
-    [vc addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:vc animated:YES completion:nil];
-}
-
-- (void)addToNotificationWithTitle:(NSString *)title
-                           atitude:(NSString *)latitude
-                            longitude:(NSString *)longitude
+- (void)addToNotificationWithTitle:(NSString *)title atitude:(NSString *)latitude longitude:(NSString *)longitude
 {
     NSString *indentifier = [NSString stringWithFormat:@"%@_%@_%@", title, latitude, longitude];
     [NSObject sendNotificationWithTitle:title
@@ -185,31 +125,41 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - CLLocationManagerDelegate
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
+#pragma mark - LYTableFooterDelegete
+- (void)footerDidAddLoction:(LYTableHeader *)footer
 {
-    CLLocation *location = [locations firstObject];//取出第一个位置
-    CLLocationCoordinate2D coordinate = location.coordinate;//位置坐标
-    
-    NSLog(@"经度：%f,纬度：%f,海拔：%f", coordinate.longitude, coordinate.latitude, location.altitude);
-    
-    //如果不需要实时定位，使用完即使关闭定位服务
-    [_locationManager stopUpdatingLocation];
-    
-    //根据坐标取得地名
-    self.geocoder = [[CLGeocoder alloc] init];
+    [self.tableView reloadData];
+}
 
-    //CLLocation *location = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
-    [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
-        CLPlacemark *placemark = [placemarks firstObject];
-        NSLog(@"详细信息:%@", placemark.addressDictionary);
-        
-        NSString *localInfo = [NSString stringWithFormat:@"%@, %@, %@", placemark.locality, placemark.subLocality, placemark.name];
-        self.locationLabel.text = @"";
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            self.locationLabel.text = localInfo;
-        });
-    }];
+#pragma mark -
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    NSArray *locations = [[NSUserDefaults standardUserDefaults] objectForKey:kAllLocations_Key];
+    
+    return locations.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *indentifier = @"identifier";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:indentifier];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:indentifier];
+    }
+    
+    NSArray *locations = [[NSUserDefaults standardUserDefaults] objectForKey:kAllLocations_Key];
+    NSArray *subLocations = locations[indexPath.row];
+    cell.textLabel.text = subLocations[2];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"经度：%@, 纬度：%@", subLocations[0], subLocations[1]];
+    
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    
 }
 
 @end

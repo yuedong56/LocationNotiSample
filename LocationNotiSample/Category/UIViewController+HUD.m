@@ -105,33 +105,38 @@ static NSString *kProgressHUD = @"kProgressHUD";
     
 }
 
-
-#pragma mark -
-- (void)startDownloadHUDWithText:(NSString *)text
+- (void)showAlertWithTitle:(NSString *)title
 {
-    self.progressHUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    self.progressHUD.mode = MBProgressHUDModeAnnularDeterminate;
-    self.progressHUD.minSize = CGSizeMake(140.f, 114.f);
-    self.progressHUD.label.text = text;
-}
+    NSLog(@"%@", title);
 
-- (void)updateDownloadProgress:(CGFloat)progress text:(NSString *)text;
-{
-    self.progressHUD.progress = progress;
-    if (text.length > 0) {
-        self.progressHUD.label.text = text;
-    }
-}
-
-- (void)finishDownloadProgressWithText:(NSString *)text
-{
-    UIImage *image = [[UIImage imageNamed:@"save_complete"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-    self.progressHUD.customView = imageView;
-    self.progressHUD.mode = MBProgressHUDModeCustomView;
-    self.progressHUD.label.text = text;
-    [self.progressHUD hideAnimated:YES afterDelay:1];
+    UIAlertController *vc = [UIAlertController alertControllerWithTitle:title message:@"" preferredStyle:UIAlertControllerStyleAlert];
+    [vc addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 
+
+//- (void)p_requestToUpdateNotifications
+//{
+//    [self showProgressHUDWithText:@"正在更新位置推送..."];
+//
+//    NSString *url = @"http://b612-beta.kajicam.com/ts/api/push/demo/get";
+//    [[AFHTTPSessionManager manager] GET:url
+//                             parameters:nil
+//                               progress:nil
+//                                success:^(NSURLSessionDataTask *task, NSArray *responseObject) {
+//        NSLog(@"responseObject == %@", responseObject);
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            [self hideProgressHUD];
+//        });
+//
+//        [self p_updateNotifications];
+//    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            [self hideProgressHUD];
+//        });
+//        NSString *errorInfo = [NSString stringWithFormat:@"更新失败：%@", error.localizedDescription];
+//        [self showAlertWithTitle:errorInfo];
+//    }];
+//}
 @end

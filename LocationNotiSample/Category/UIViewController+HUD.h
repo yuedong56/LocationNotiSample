@@ -24,9 +24,6 @@
 
 - (void)showToastViewWithText:(NSString *)text isOnWindow:(BOOL)isOnWindow showtime:(CGFloat)time;
 
-#pragma mark -
-- (void)startDownloadHUDWithText:(NSString *)text;
-- (void)updateDownloadProgress:(CGFloat)progress text:(NSString *)text;
-- (void)finishDownloadProgressWithText:(NSString *)text;
+- (void)showAlertWithTitle:(NSString *)title;
 
 @end

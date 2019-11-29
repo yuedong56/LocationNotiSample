@@ -13,6 +13,9 @@
 #import <AFNetworking/AFNetworking.h>
 #import "UIViewController+HUD.h"
 
+#define kAllLocations_Key  @"kAllLocations_Key" //存储的地理位置
+
+
 #define  kScreenWidth  ([UIScreen mainScreen].bounds.size.width)
 #define  kScreenHeight ([UIScreen mainScreen].bounds.size.height)
 
