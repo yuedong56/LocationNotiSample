@@ -54,6 +54,7 @@
 
 + (void)removeAllNotification;
 {
+    [[UNUserNotificationCenter currentNotificationCenter] removeAllDeliveredNotifications];
     [[UNUserNotificationCenter currentNotificationCenter] removeAllPendingNotificationRequests];
 }
 
