@@ -19,6 +19,8 @@
 @property (nonatomic, strong) UITextField *field2;
 @property (nonatomic, strong) UIButton *addButton;
 
+@property (nonatomic, strong) UITextField *radiusField;
+
 @end
 
 

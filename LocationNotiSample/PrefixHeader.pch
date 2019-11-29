@@ -12,6 +12,7 @@
 #import <MBProgressHUD/MBProgressHUD.h>
 #import <AFNetworking/AFNetworking.h>
 #import "UIViewController+HUD.h"
+#import "LocationModel.h"
 
 #define kAllLocations_Key  @"kAllLocations_Key" //存储的地理位置
 

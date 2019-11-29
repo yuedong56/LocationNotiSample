@@ -15,7 +15,7 @@
 
 @interface ViewController ()<UITableViewDelegate, UITableViewDataSource, LYTableFooterDelegete>
 {
-    
+    NSMutableArray *models;
 }
 @property (nonatomic, strong) UIButton *updateButton;
 @property (nonatomic, strong) LYBottomBar *bottomBar;
@@ -42,6 +42,8 @@
     self.header = [[LYTableHeader alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, LYTableFooter_Height)];
     self.header.delegate = self;
     self.tableView.tableHeaderView = self.header;
+    
+    [self reloadData];
     
     //
     self.updateButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -78,8 +80,6 @@
 
 - (void)p_updateNotifications
 {
-    NSArray *locations = nil;
-    
     // 1. 先移除所有推送
     NSArray *allNotiIds = [[NSUserDefaults standardUserDefaults] objectForKey:kAllNotis_Indentifer];
     [allNotiIds enumerateObjectsUsingBlock:^(NSString *indentifer, NSUInteger idx, BOOL *stop) {
@@ -88,11 +88,12 @@
     [[NSUserDefaults standardUserDefaults] setObject:nil forKey:kAllNotis_Indentifer];
     
     // 2. 根据地理位置更新推送
-    [locations enumerateObjectsUsingBlock:^(NSDictionary *dic, NSUInteger idx, BOOL *stop) {
-        NSString *addr_name = dic[@"addr_name"];
-        NSString *latitude = dic[@"latitude"];
-        NSString *longitude = dic[@"longitude"];
-        [self addToNotificationWithTitle:addr_name atitude:latitude longitude:longitude];
+    __block int selectedCount = 0;
+    [models enumerateObjectsUsingBlock:^(LocationModel *model, NSUInteger idx, BOOL *stop) {
+        if (model.isSelected) {
+            [self addToNotificationWithTitle:model.locationDes atitude:model.latitude longitude:model.longitude];
+            selectedCount ++;
+        }
         
 //            CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
 //            [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
@@ -101,7 +102,7 @@
 //            }];
     }];
     
-    NSString *info = [NSString stringWithFormat:@"已成功设置 %ld 个位置推送", locations.count];
+    NSString *info = [NSString stringWithFormat:@"已成功设置 %d 个位置推送", selectedCount];
     [self showAlertWithTitle:info];
 }
 
@@ -112,7 +113,7 @@
                                    body:@"测试提醒body"
                                latitude:[latitude doubleValue]
                               longitude:[longitude doubleValue]
-                                 radius:500
+                                 radius:_header.radiusField.text.length>0 ? _header.radiusField.text.doubleValue : 200
                                  repeat:YES
                          notiIdentifier:indentifier];
     
@@ -125,18 +126,31 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (void)reloadData
+{
+    NSArray *locations = [[NSUserDefaults standardUserDefaults] objectForKey:kAllLocations_Key];
+
+    models = [NSMutableArray array];
+    [locations enumerateObjectsUsingBlock:^(NSArray *subLocs, NSUInteger idx, BOOL *stop) {
+        LocationModel *model = [[LocationModel alloc] init];
+        model.longitude = subLocs[0];
+        model.latitude = subLocs[1];
+        model.locationDes = subLocs[2];
+        [models addObject:model];
+    }];
+    [self.tableView reloadData];
+}
+
 #pragma mark - LYTableFooterDelegete
 - (void)footerDidAddLoction:(LYTableHeader *)footer
 {
-    [self.tableView reloadData];
+    [self reloadData];
 }
 
 #pragma mark -
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSArray *locations = [[NSUserDefaults standardUserDefaults] objectForKey:kAllLocations_Key];
-    
-    return locations.count;
+    return models.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -146,11 +160,10 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:indentifier];
     }
-    
-    NSArray *locations = [[NSUserDefaults standardUserDefaults] objectForKey:kAllLocations_Key];
-    NSArray *subLocations = locations[indexPath.row];
-    cell.textLabel.text = subLocations[2];
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"经度：%@, 纬度：%@", subLocations[0], subLocations[1]];
+    LocationModel *model = models[indexPath.row];
+    cell.textLabel.text = model.locationDes;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"经度：%@, 纬度：%@", model.longitude, model.latitude];
+    cell.accessoryType = model.isSelected ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     
     return cell;
 }
@@ -159,7 +172,9 @@
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    
+    LocationModel *model = models[indexPath.row];
+    model.isSelected = !model.isSelected;
+    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 @end
