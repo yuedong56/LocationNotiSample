@@ -32,6 +32,7 @@
         self.field1.placeholder = @"输入经度";
         self.field1.borderStyle = UITextBorderStyleRoundedRect;
         self.field1.returnKeyType = UIReturnKeyDone;
+        self.field1.clearButtonMode = UITextFieldViewModeAlways;
         self.field1.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
         self.field1.delegate = self;
         [self addSubview:self.field1];
@@ -40,6 +41,7 @@
         self.field2.placeholder = @"输入纬度";
         self.field2.borderStyle = UITextBorderStyleRoundedRect;
         self.field2.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+        self.field2.clearButtonMode = UITextFieldViewModeAlways;
         self.field2.returnKeyType = UIReturnKeyDone;
         self.field2.delegate = self;
         [self addSubview:self.field2];
@@ -55,6 +57,7 @@
         self.radiusField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
         self.radiusField.borderStyle = UITextBorderStyleRoundedRect;
         self.radiusField.returnKeyType = UIReturnKeyDone;
+        self.radiusField.clearButtonMode = UITextFieldViewModeAlways;
         self.radiusField.delegate = self;
         [self addSubview:self.radiusField];
     }
@@ -82,9 +85,6 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self.delegate footerDidAddLoction:self];
-        
-        self.field1.text = nil;
-        self.field2.text = nil;
     }];
 }
 

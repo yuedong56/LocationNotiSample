@@ -38,7 +38,7 @@
     self.tableView.delegate =  self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
-    
+
     self.header = [[LYTableHeader alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, LYTableFooter_Height)];
     self.header.delegate = self;
     self.tableView.tableHeaderView = self.header;
@@ -104,7 +104,11 @@
     }];
     
     NSString *info = [NSString stringWithFormat:@"已成功设置 %d 个位置推送", selectedCount];
-    [self showAlertWithTitle:info];
+    if (selectedCount == 0) {
+        [self showAlertWithTitle:@"尚未选中任何地址，点击列表可选中对应地址后重试！"];
+    } else {
+        [self showToastViewWithText:info isOnWindow:YES];
+    }
 }
 
 - (void)addToNotificationWithTitle:(NSString *)title atitude:(NSString *)latitude longitude:(NSString *)longitude
@@ -202,6 +206,11 @@
     //deleteRowAction.image = [UIImage imageNamed:@"delete_today"];
     deleteRowAction.backgroundColor = [UIColor redColor];
     return [UISwipeActionsConfiguration configurationWithActions:@[deleteRowAction]];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [self.view endEditing:YES];
 }
 
 @end
