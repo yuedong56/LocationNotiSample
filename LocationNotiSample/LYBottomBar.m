@@ -28,6 +28,11 @@
         [self.leftButton setImage:ImageNamed(@"location_l") forState:UIControlStateNormal];
         [self.leftButton  addTarget:self action:@selector(locationButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.leftButton];
+        
+        self.rightButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        self.rightButton.frame = CGRectMake(kScreenWidth-60, 0, 60, kLYBottomBar_Height);
+        [self.rightButton setImage:ImageNamed(@"reload") forState:UIControlStateNormal];
+        [self addSubview:self.rightButton];
     }
     return self;
 }

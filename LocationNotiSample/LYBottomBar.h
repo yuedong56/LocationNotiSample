@@ -20,4 +20,6 @@
 @property (nonatomic, strong) UIButton *leftButton;
 @property (nonatomic, strong) UILabel *locationLabel;
 
+@property (nonatomic, strong) UIButton *rightButton;
+
 @end

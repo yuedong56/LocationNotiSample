@@ -53,6 +53,7 @@
     
     //
     self.bottomBar = [[LYBottomBar alloc] initWithFrame:CGRectZero];
+    [self.bottomBar.rightButton addTarget:self action:@selector(reloadData) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.bottomBar];
 }
 
@@ -175,6 +176,32 @@
     LocationModel *model = models[indexPath.row];
     model.isSelected = !model.isSelected;
     [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+}
+
+#pragma mark - 左滑删除
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- ( UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UIContextualAction *deleteRowAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive title:@"删除" handler:^(UIContextualAction *action, UIView *sourceView, void (^completionHandler)(BOOL))
+    {
+        completionHandler(YES);
+//        [self p_deleteWithIndex:indexPath.row];
+        NSMutableArray *locations = [[[NSUserDefaults standardUserDefaults] objectForKey:kAllLocations_Key] mutableCopy];
+        [locations removeObjectAtIndex:indexPath.row];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:locations forKey:kAllLocations_Key];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [self->models removeObjectAtIndex:indexPath.row];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }];
+    //deleteRowAction.image = [UIImage imageNamed:@"delete_today"];
+    deleteRowAction.backgroundColor = [UIColor redColor];
+    return [UISwipeActionsConfiguration configurationWithActions:@[deleteRowAction]];
 }
 
 @end
