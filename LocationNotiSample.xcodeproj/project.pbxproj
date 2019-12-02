@@ -15,6 +15,7 @@
 		3506EBC5238CC309009C7A6F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3506EBC4238CC309009C7A6F /* main.m */; };
 		3506EBCE238CC76A009C7A6F /* UIViewController+HUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 3506EBCD238CC769009C7A6F /* UIViewController+HUD.m */; };
 		3506EBD1238CD325009C7A6F /* NSObject+Notification.m in Sources */ = {isa = PBXBuildFile; fileRef = 3506EBD0238CD325009C7A6F /* NSObject+Notification.m */; };
+		35E312D12394BF0E00BB4ED6 /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35E312D02394BF0E00BB4ED6 /* SearchViewController.m */; };
 		35ED682D238FA66000E7C40A /* LYBottomBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 35ED682C238FA66000E7C40A /* LYBottomBar.m */; };
 		35ED6830238FAEEE00E7C40A /* LYTableHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 35ED682F238FAEEE00E7C40A /* LYTableHeader.m */; };
 		35ED68362391090000E7C40A /* LocationModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 35ED68352391090000E7C40A /* LocationModel.m */; };
@@ -37,6 +38,8 @@
 		3506EBCD238CC769009C7A6F /* UIViewController+HUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+HUD.m"; sourceTree = "<group>"; };
 		3506EBCF238CD325009C7A6F /* NSObject+Notification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Notification.h"; sourceTree = "<group>"; };
 		3506EBD0238CD325009C7A6F /* NSObject+Notification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Notification.m"; sourceTree = "<group>"; };
+		35E312CF2394BF0E00BB4ED6 /* SearchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
+		35E312D02394BF0E00BB4ED6 /* SearchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SearchViewController.m; sourceTree = "<group>"; };
 		35ED682B238FA66000E7C40A /* LYBottomBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LYBottomBar.h; sourceTree = "<group>"; };
 		35ED682C238FA66000E7C40A /* LYBottomBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LYBottomBar.m; sourceTree = "<group>"; };
 		35ED682E238FAEEE00E7C40A /* LYTableHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LYTableHeader.h; sourceTree = "<group>"; };
@@ -100,6 +103,8 @@
 				35ED682F238FAEEE00E7C40A /* LYTableHeader.m */,
 				35ED68342391090000E7C40A /* LocationModel.h */,
 				35ED68352391090000E7C40A /* LocationModel.m */,
+				35E312CF2394BF0E00BB4ED6 /* SearchViewController.h */,
+				35E312D02394BF0E00BB4ED6 /* SearchViewController.m */,
 				35ED68332391089000E7C40A /* Category */,
 				3506EBBB238CC308009C7A6F /* Main.storyboard */,
 				3506EBBE238CC309009C7A6F /* Assets.xcassets */,
@@ -230,6 +235,7 @@
 				35ED682D238FA66000E7C40A /* LYBottomBar.m in Sources */,
 				3506EBB4238CC308009C7A6F /* AppDelegate.m in Sources */,
 				35ED6830238FAEEE00E7C40A /* LYTableHeader.m in Sources */,
+				35E312D12394BF0E00BB4ED6 /* SearchViewController.m in Sources */,
 				35ED68362391090000E7C40A /* LocationModel.m in Sources */,
 				3506EBCE238CC76A009C7A6F /* UIViewController+HUD.m in Sources */,
 				3506EBC5238CC309009C7A6F /* main.m in Sources */,

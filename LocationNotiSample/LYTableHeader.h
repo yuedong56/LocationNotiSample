@@ -6,7 +6,7 @@
 //  Copyright © 2019 LY. All rights reserved.
 //
 
-#define LYTableFooter_Height  150
+#define LYTableFooter_Height  140
 
 #import <UIKit/UIKit.h>
 

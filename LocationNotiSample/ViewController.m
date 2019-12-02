@@ -10,8 +10,9 @@
 #import "NSObject+Notification.h"
 #import "LYBottomBar.h"
 #import "LYTableHeader.h"
+#import "SearchViewController.h"
 
-@interface ViewController ()<UITableViewDelegate, UITableViewDataSource, LYTableFooterDelegete>
+@interface ViewController ()<UITableViewDelegate, UITableViewDataSource, LYTableFooterDelegete, SearchViewControllerDelegate>
 {
     NSMutableArray *models;
 }
@@ -50,6 +51,10 @@
     [self.updateButton addTarget:self action:@selector(updateButtonAction:) forControlEvents:UIControlEventTouchUpInside];
     
     //
+    UIBarButtonItem *searchItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(searchButtonAction:)];
+    self.navigationItem.leftBarButtonItem = searchItem;
+    
+    //
     self.bottomBar = [[LYBottomBar alloc] initWithFrame:CGRectZero];
     [self.bottomBar.rightButton addTarget:self action:@selector(reloadData) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.bottomBar];
@@ -75,6 +80,13 @@
             [self p_updateNotifications];
         });
     }];
+}
+
+- (void)searchButtonAction:(UIButton *)button
+{
+    SearchViewController *vc = [[SearchViewController alloc] init];
+    vc.delegate = self;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)p_updateNotifications
@@ -191,6 +203,12 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     [self.view endEditing:YES];
+}
+
+#pragma mark - SearchViewControllerDelegate
+- (void)searchController:(SearchViewController *)vc didSelectPlacemark:(CLPlacemark *)placemark
+{
+    [self reloadData];
 }
 
 @end

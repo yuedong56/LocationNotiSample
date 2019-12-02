@@ -19,7 +19,11 @@
         self.locationLabel.font = [UIFont systemFontOfSize:12];
         self.locationLabel.textAlignment = NSTextAlignmentCenter;
         self.locationLabel.text = @"当前位置：null";
-        self.locationLabel.textColor = [UIColor blackColor];
+        if (@available(iOS 13.0, *)) {
+            self.locationLabel.textColor = [UIColor systemGray3Color];
+        } else {
+            self.locationLabel.textColor = [UIColor blackColor];
+        }
         [self addSubview:self.locationLabel];
 
         //
